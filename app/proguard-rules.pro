@@ -14,6 +14,9 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
+
+-keep class hat.holo.**{*;}
+
 -keepattributes SourceFile,LineNumberTable
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket
