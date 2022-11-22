@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:label="GetToken"
+        tools:ignore="MissingApplicationIcon"
+        tools:targetApi="31">
+
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="获取米游社登录信息" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82" />
+        <meta-data
+            android:name="xposedscope"
+            android:resource="@array/xposedscope" />
+
+        <activity
+            android:name=".TokenActivity"
+            android:exported="true" />
+    </application>
+
+</manifest>
