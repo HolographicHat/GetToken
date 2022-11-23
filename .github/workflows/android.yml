@@ -40,9 +40,9 @@ jobs:
         name: Artifacts
         path: out
     - name: Set up Node 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
     - name: Install dependencies
       run: npm install axios@0.27.2
     - name: Run post build script
