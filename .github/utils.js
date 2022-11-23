@@ -1,6 +1,7 @@
 const fs = require("fs")
 const axios = require("axios").create({
-    validateStatus: _ => true
+    validateStatus: _ => true,
+    maxBodyLength: Infinity
 })
 
 const repo = "HolographicHat/GetToken"
