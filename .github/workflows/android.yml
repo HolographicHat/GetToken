@@ -10,7 +10,9 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    environment: Build
+    env:
+      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 11
