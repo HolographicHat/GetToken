@@ -1,6 +1,7 @@
 name: Android CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "master" ]
   pull_request:
@@ -14,7 +15,8 @@ jobs:
       SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
       SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
@@ -25,18 +27,22 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew assembleRelease
-    - run: sudo apt-get install -y jq
+    - name: Install jq
+      run: sudo apt-get install -y jq
     - name: Download package
       run: "curl -H 'x-rpc-client_type: 2' -H 'x-rpc-app_version: 2.37.1' -H 'x-rpc-channel: miyousheluodi' https://api-takumi.mihoyo.com/ptolemaios/api/getLatestRelease | jq --raw-output '.data.package_url' | xargs curl -o origin.apk"
     - name: Patch package
-      run: "java -jar gradle/lspatch/jar-v0.5.1-361-release.jar -f -l 2 -m app/build/outputs/apk/release/app-release.apk -o pout origin.apk"
+      run: "mkdir out && mv app/build/outputs/apk/release/app-release.apk out && java -jar gradle/lspatch/jar-v0.5.1-361-release.jar -f -l 2 -m -o out origin.apk"
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3.1.0
       with:
         name: Artifacts
-        path: app/build/outputs/apk/release/app-release-unsigned.apk
-    - name: Upload patched package
-      uses: actions/upload-artifact@v3.1.0
-      with:
-        name: Artifacts
-        path: pout
+        path: out
+    #- name: Set up Node 16
+    #    uses: actions/setup-node@v3
+    #    with:
+    #      node-version: 16
+    #- name: Install depencies
+    #  run: npm install axios@0.27.2
+    #- name: Run post build script
+    #  run:

@@ -109,9 +109,10 @@ private fun TokenActivity.Content(accountInfo: AccountInfo) = Column(
                 onClick = {
                     runCatching {
                         val authStr = buildMap {
-                            put("uid", accountInfo.uid)
+                            put("ltuid", accountInfo.uid)
                             put("ltoken", accountInfo.lToken)
                             if (grantSToken) {
+                                put("stuid", accountInfo.uid)
                                 put("mid", accountInfo.mid)
                                 put("stoken", accountInfo.sToken)
                             }
