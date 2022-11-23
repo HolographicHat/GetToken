@@ -10,9 +10,10 @@ const utils = require("./utils");
         }
         for (const path of fs.readdirSync("out")) {
             console.log(`upload ${path}...`)
-            await utils.uploadReleaseAsset(releaseInfo["upload_url"], path)
+            await utils.uploadReleaseAsset(releaseInfo["upload_url"], `out/${path}`)
         }
     } catch (e) {
         console.log(e)
     }
 })()
+
