@@ -19,7 +19,7 @@ const getAppVersion = async () => {
 
 const getLatestRelease = async () => {
     const repoLatestVersionRsp = await axios.get(`https://api.github.com/repos/${repo}/releases/latest`)
-    return repoLatestVersionRsp.data.name
+    return repoLatestVersionRsp.data
 }
 
 const createRelease = async (name, desc) => {
