@@ -50,4 +50,14 @@ const uploadReleaseAsset = async (url, path) => {
     })
 }
 
-module.exports = { getAppVersion, getLatestRelease, createRelease, uploadReleaseAsset }
+const runWorkflow = async id => {
+    return await axios.post(`https://api.github.com/repos/${repo}/actions/workflows/${id}/dispatches`, {
+        ref: "master"
+    }, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+}
+
+module.exports = { getAppVersion, getLatestRelease, createRelease, uploadReleaseAsset, runWorkflow }

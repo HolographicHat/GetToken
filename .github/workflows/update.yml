@@ -1,0 +1,25 @@
+name: Update Check
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GHP_TOKEN: ${{ secrets.GHP_TOKEN }}
+      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Node 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install depencies
+        run: npm install axios@0.27.2
+      - name: Run script
+        run: node .github/update.js
