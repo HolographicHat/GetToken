@@ -10,7 +10,7 @@ object AccountManager {
     private val methodTable = arrayListOf<Method>()
 
     fun init(cl: ClassLoader) {
-        val clz = cl.loadClass("com.mihoyo.hyperion.user.account.AccountManager")
+        val clz = cl.loadClass("com.mihoyo.hyperion.biz.login.account.AccountManager")
         instance = clz.getDeclaredField("INSTANCE").get(null)!!
         methodTable.add(clz.getDeclaredMethod("getMid"))
         methodTable.add(clz.getDeclaredMethod("getUserId"))
