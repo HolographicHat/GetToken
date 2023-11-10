@@ -1,14 +1,13 @@
 package hat.holo.token
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.res.XResources
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.annotation.Keep
 import dalvik.system.BaseDexClassLoader
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -53,21 +52,28 @@ class ModuleMain : IXposedHookLoadPackage, IXposedHookZygoteInit {
                     appendToClassPath(app.applicationContext)
                 }
             })
-            val c1 = loadClass("com.mihoyo.hyperion.main.user.MainUserInfoPage")
-            XposedBridge.hookAllConstructors(c1, object : XC_MethodHook() {
+            val u = loadClass("com.mihoyo.hyperion.user_profile.UserProfileFragment")
+            val rng = loadClass("rn.g")  // FragmentUserProfileBinding.java
+            findAndHookMethod(u, "onViewCreated", android.view.View::class.java, android.os.Bundle::class.java, object : XC_MethodHook() {
                 override fun afterHookedMethod(p: MethodHookParam) {
-                    if (p.args.size != 3 || p.args.getOrNull(0) !is Context) return
-                    val root1 = p.thisObject as FrameLayout
-                    val root2 = root1.getChildAt(0) as FrameLayout
-                    val root3 = root2.getChildAt(0) as ViewGroup
-                    val ctx = root1.context
-                    val scanId = ctx.resources.getIdentifier("scanIv", "id", targetPackageName)
-                    val scanBtn = root3.findViewById<ImageView>(scanId)
+                    val getBinding = u.getDeclaredMethod("getBinding")
+                    getBinding.isAccessible = true
+                    val bindingInstance = getBinding.invoke(p.thisObject)
+                    val getLinearLayout = rng.getDeclaredField("b")
+                    getLinearLayout.isAccessible = true
+                    val linearLayout = getLinearLayout.get(bindingInstance) as LinearLayout
+                    val ctx = linearLayout.context
+                    val getScanButton = rng.getDeclaredField("w")
+                    getScanButton.isAccessible = true
+                    val scanButton = getScanButton.get(bindingInstance) as ImageView
+
                     val tokenBtn = ImageView(ctx)
                     tokenBtn.id = XResources.getFakeResId("getTokenIv")
                     tokenBtn.setImageDrawable(Res.iconToken)
                     val size = Dimension.convertDpToPixel(32f, ctx).roundToInt()
                     tokenBtn.layoutParams = ViewGroup.LayoutParams(size, size)
+                    tokenBtn.setPadding(10, 6, 0, 6)
+                    tokenBtn.scaleType = ImageView.ScaleType.FIT_XY
                     tokenBtn.setOnClickListener {
                         if (AccountManager.isLogin) {
                             if (isPatch) {
@@ -85,23 +91,12 @@ class ModuleMain : IXposedHookLoadPackage, IXposedHookZygoteInit {
                             AppUtils.showToast("未登录")
                         }
                     }
-                    root3.addView(tokenBtn)
-                    for (i in 0 until root3.childCount) {
-                        val view = root3.getChildAt(i)
+
+                    linearLayout.addView(tokenBtn, linearLayout.indexOfChild(scanButton) + 1)
+                    for (i in 0 until linearLayout.childCount) {
+                        val view = linearLayout.getChildAt(i)
                         if (view.id == -1) view.id = XResources.getFakeResId("b5AaLhI6WDlkTMIrRA$i")
                     }
-                    val set = createConstraintSet(ctx)
-                    if (set == null) {
-                        AlertDialog.Builder(ctx).run {
-                            setTitle("Error")
-                            setMessage("Create ConstraintSetWrapper fail.")
-                        }.create().show()
-                        return
-                    }
-                    set.clone(root3)
-                    set.connect(tokenBtn.id, 2, scanBtn.id, 1, Dimension.convertDpToPixel(9f, ctx).roundToInt())
-                    set.connect(tokenBtn.id, 3, scanBtn.id, 3)
-                    set.applyTo(root3)
                 }
             })
         }
