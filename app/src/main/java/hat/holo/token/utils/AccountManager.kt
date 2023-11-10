@@ -1,37 +1,29 @@
 package hat.holo.token.utils
 
 import hat.holo.token.models.AccountInfo
-import java.lang.reflect.Method
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 object AccountManager {
 
-    private lateinit var instance: Any
-    private val methodTable = arrayListOf<Method>()
+    private lateinit var instPorte: Any
+    private lateinit var clzPorte: Class<*>
+    private lateinit var clzAccount: Class<*>
 
     fun init(cl: ClassLoader) {
-        val clz = cl.loadClass("com.mihoyo.hyperion.biz.login.account.AccountManager")
-        instance = clz.getDeclaredField("INSTANCE").get(null)!!
-        methodTable.add(clz.getDeclaredMethod("getMid"))
-        methodTable.add(clz.getDeclaredMethod("getUserId"))
-        methodTable.add(clz.getDeclaredMethod("getLToken"))
-        methodTable.add(clz.getDeclaredMethod("getSToken"))
-        methodTable.add(clz.getDeclaredMethod("getSTokenV1"))
-        methodTable.add(clz.getDeclaredMethod("userIsLogin"))
-        methodTable.add(clz.getDeclaredMethod("getLastUserId"))
-        methodTable.add(clz.getDeclaredMethod("getLoginTicket"))
+        clzPorte = cl.loadClass("com.mihoyo.platform.account.sdk.Porte")
+        clzAccount = cl.loadClass("com.mihoyo.platform.account.sdk.bean.Account")
+        instPorte = clzPorte.getDeclaredField("INSTANCE").get(null)!!
     }
 
-    val isLogin get() = methodTable[5].invoke(instance) as Boolean
+    private fun loginCurrentAccount() = clzPorte.getDeclaredMethod("loginCurrentAccount").invoke(instPorte)
 
-    val mid get() = methodTable[0].invoke(instance) as String
-    val uid get() = methodTable[1].invoke(instance) as String
-    val lToken get() = methodTable[2].invoke(instance) as String
-    val sToken get() = methodTable[3].invoke(instance) as String
-    val sTokenV1 get() = methodTable[4].invoke(instance) as String
-    val lastUserId get() = methodTable[6].invoke(instance) as String
-    val loginTicket get() = methodTable[7].invoke(instance) as String
+    val isLogin get() = if (loginCurrentAccount() == null) false else !uid.isNullOrEmpty() && !sToken.isNullOrEmpty()
 
-    val accountInfo get() = AccountInfo(mid, uid, lToken, sToken)
+    val mid get() = clzAccount.getDeclaredMethod("getMid").invoke(loginCurrentAccount()) as String?
+    val uid get() = clzAccount.getDeclaredMethod("getAid").invoke(loginCurrentAccount()) as String?
+    val lToken get() = clzPorte.getDeclaredMethod("getLToken").invoke(instPorte) as String?
+    val sToken get() = clzAccount.getDeclaredMethod("getTokenStr").invoke(loginCurrentAccount()) as String?
+
+    val accountInfo get() = AccountInfo(mid!!, uid!!, lToken!!, sToken!!)
 
 }
