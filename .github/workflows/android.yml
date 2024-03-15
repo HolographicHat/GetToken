@@ -31,7 +31,7 @@ jobs:
     - name: Install jq
       run: sudo apt-get install -y jq
     - name: Download package
-      run: "curl -H 'x-rpc-client_type: 2' -H 'x-rpc-app_version: 2.52.1' -H 'x-rpc-channel: miyousheluodi' https://api-takumi.mihoyo.com/ptolemaios/api/getLatestRelease | jq --raw-output '.data.package_url' | xargs curl -o miyoushe.apk"
+      run: "curl -H 'x-rpc-client_type: 2' -H 'x-rpc-app_version: 2.68.1' -H 'x-rpc-channel: miyousheluodi' https://api-takumi.mihoyo.com/ptolemaios/api/getLatestRelease | jq --raw-output '.data.package_url' | xargs curl -o miyoushe.apk"
     - name: Patch package
       run: "mkdir out && mv app/build/outputs/apk/release/app-release.apk . && java -jar gradle/lspatch/jar-v0.5.1-361-release.jar -f -l 2 -m app-release.apk -o out miyoushe.apk && mv app-release.apk out"
     - name: Upload build artifacts
