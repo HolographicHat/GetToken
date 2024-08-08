@@ -52,27 +52,18 @@ class ModuleMain : IXposedHookLoadPackage, IXposedHookZygoteInit {
                     appendToClassPath(app.applicationContext)
                 }
             })
-            val u = loadClass("com.mihoyo.hyperion.user_profile.UserProfileFragment")
-            val rng = loadClass("rn.g")  // FragmentUserProfileBinding.java
-            findAndHookMethod(u, "onViewCreated", android.view.View::class.java, android.os.Bundle::class.java, object : XC_MethodHook() {
+            val fragmentKlass = loadClass("com.mihoyo.hyperion.user_profile.UserProfileFragment")
+            findAndHookMethod(fragmentKlass, "onViewCreated", android.view.View::class.java, android.os.Bundle::class.java, object : XC_MethodHook() {
                 override fun afterHookedMethod(p: MethodHookParam) {
-                    val getBinding = u.getDeclaredMethod("getBinding")
-                    getBinding.isAccessible = true
-                    val bindingInstance = getBinding.invoke(p.thisObject)
-                    val getLinearLayout = rng.getDeclaredField("b")
-                    getLinearLayout.isAccessible = true
-                    val linearLayout = getLinearLayout.get(bindingInstance) as LinearLayout
+                    val fragmentBinding = p.thisObject.invokeMethod<Any>("getBinding")
+                    val linearLayout = fragmentBinding.visitField<LinearLayout>("b")
                     val ctx = linearLayout.context
-                    val getScanButton = rng.getDeclaredField("w")
-                    getScanButton.isAccessible = true
-                    val scanButton = getScanButton.get(bindingInstance) as ImageView
-
                     val tokenBtn = ImageView(ctx)
                     tokenBtn.id = XResources.getFakeResId("getTokenIv")
                     tokenBtn.setImageDrawable(Res.iconToken)
                     val size = Dimension.convertDpToPixel(32f, ctx).roundToInt()
                     tokenBtn.layoutParams = ViewGroup.LayoutParams(size, size)
-                    tokenBtn.setPadding(10, 6, 0, 6)
+                    tokenBtn.setPadding(20, 6, 0, 6)
                     tokenBtn.scaleType = ImageView.ScaleType.FIT_XY
                     tokenBtn.setOnClickListener {
                         if (AccountManager.isLogin) {
@@ -91,7 +82,7 @@ class ModuleMain : IXposedHookLoadPackage, IXposedHookZygoteInit {
                             AppUtils.showToast("未登录")
                         }
                     }
-
+                    val scanButton = fragmentBinding.visitField<ImageView>("w")
                     linearLayout.addView(tokenBtn, linearLayout.indexOfChild(scanButton) + 1)
                     for (i in 0 until linearLayout.childCount) {
                         val view = linearLayout.getChildAt(i)

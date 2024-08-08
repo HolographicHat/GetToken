@@ -1,17 +1,18 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
 android {
 
     namespace 'hat.holo.token'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "hat.holo.token"
         minSdk 28
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
         vectorDrawables {
@@ -42,6 +43,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += [
+            "-Xcontext-receivers"
+        ]
     }
     buildFeatures {
         compose true
@@ -58,17 +62,18 @@ android {
 
 dependencies {
 
-    implementation "androidx.core:core-ktx:1.9.0"
-    implementation "androidx.appcompat:appcompat:1.5.1"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
-    implementation "androidx.compose.ui:ui:1.3.1"
-    implementation "androidx.compose.material:material:1.3.1"
-    implementation "androidx.activity:activity-compose:1.6.1"
+    implementation "androidx.core:core-ktx:1.13.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
+    implementation "androidx.compose.ui:ui:1.6.6"
+    implementation "androidx.compose.material:material:1.6.6"
+    implementation "androidx.activity:activity-compose:1.9.0"
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.1"
-    implementation "com.google.code.gson:gson:2.10"
-    implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.2"
-    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.34.0"
+    implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.14"
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.14"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"
     compileOnly files("libs/api-82.jar")
 
 }
