@@ -15,6 +15,10 @@
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 
+-obfuscationdictionary proguard-dict.txt
+-classobfuscationdictionary proguard-dict.txt
+-packageobfuscationdictionary proguard-dict.txt
+
 -keep class hat.holo.**{*;}
 
 -keepattributes SourceFile,LineNumberTable

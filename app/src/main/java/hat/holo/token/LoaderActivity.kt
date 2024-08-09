@@ -6,7 +6,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.ArrayMap
 import dalvik.system.DexClassLoader
-import hat.holo.token.utils.setAccess
+import hat.holo.token.utils.visitAndSetField
+import hat.holo.token.utils.visitField
+import hat.holo.token.utils.visitParentField
 import java.lang.ref.WeakReference
 
 class LoaderActivity : Activity() {
@@ -30,14 +32,10 @@ class LoaderActivity : Activity() {
     // platform/frameworks/base/+/master/core/java/android/app/ActivityThread.java
     @SuppressLint("DiscouragedPrivateApi")
     private fun setClassLoader(classLoader: ClassLoader): ClassLoader {
-        val mainThread = Activity::class.java.getDeclaredField("mMainThread").setAccess().get(this)
-        val apks = mainThread.javaClass.getDeclaredField("mPackages").setAccess().get(mainThread) as ArrayMap<*, *>
-        val apkRef = apks[packageName] as WeakReference<*>
-        val loadedApk = apkRef.get() ?: throw IllegalStateException("WeakRef<LoadedApk> is null!")
-        val fClassLoader = loadedApk.javaClass.getDeclaredField("mClassLoader").setAccess()
-        val oClassLoader = fClassLoader.get(loadedApk)
-        fClassLoader.set(loadedApk, classLoader)
-        return oClassLoader as ClassLoader
+        val actThread = this.visitParentField<Activity, Any>("mMainThread")
+        val pkgs = actThread.visitField<ArrayMap<String, WeakReference<*>>>("mPackages")
+        val pkg = pkgs[packageName]?.get() ?: throw IllegalStateException("WeakRef<LoadedApk> is null!")
+        return pkg.visitAndSetField<ClassLoader>("mClassLoader", classLoader)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
