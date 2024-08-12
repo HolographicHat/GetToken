@@ -46,9 +46,10 @@ class ModuleMain : IXposedHookLoadPackage, IXposedHookZygoteInit {
             val c0 = loadClass("com.mihoyo.hyperion.app.HyperionApplicationHelper")
             findAndHookMethod(c0, "initOnMainProcess", Application::class.java, object : XC_MethodHook() {
                 override fun afterHookedMethod(p: MethodHookParam) {
-                    AppUtils.init(classLoader)
-                    AccountManager.init(classLoader)
                     val app = p.args[0] as Application
+                    AppUtils.init(classLoader)
+                    DeviceManager.init(classLoader, app.applicationContext)
+                    AccountManager.init(classLoader)
                     appendToClassPath(app.applicationContext)
                 }
             })
@@ -70,12 +71,14 @@ class ModuleMain : IXposedHookLoadPackage, IXposedHookZygoteInit {
                             if (isPatch) {
                                 val intent = Intent(ctx, LoaderActivity::class.java)
                                 intent.putExtra("accountInfo", AccountManager.accountInfo)
+                                intent.putExtra("deviceInfo", DeviceManager.deviceInfo)
                                 intent.putExtra("dexPath", modulePath)
                                 ctx.startActivity(intent)
                             } else {
                                 val intent = Intent()
                                 intent.setClassName("hat.holo.token", "hat.holo.token.TokenActivity")
                                 intent.putExtra("accountInfo", AccountManager.accountInfo)
+                                intent.putExtra("deviceInfo", DeviceManager.deviceInfo)
                                 ctx.startActivity(intent)
                             }
                         } else {

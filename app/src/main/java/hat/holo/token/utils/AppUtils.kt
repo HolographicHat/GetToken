@@ -1,19 +1,13 @@
 package hat.holo.token.utils
 
-import java.lang.reflect.Method
-
 object AppUtils {
 
-    private lateinit var instance: Any
-    private val methodTable = arrayListOf<Method>()
+    private lateinit var inst: Any
 
     fun init(cl: ClassLoader) {
-        val clz = cl.loadClass("com.mihoyo.hyperion.utils.AppUtils")
-        instance = clz.getDeclaredField("INSTANCE").get(null)!!
-        methodTable.add(clz.getDeclaredMethod("showToast", String::class.java))
+        inst = cl.loadClass("com.mihoyo.hyperion.utils.AppUtils").visitStaticField<Any>("INSTANCE")
     }
 
-    fun showToast(str: String) {
-        methodTable[0].invoke(instance, str)
-    }
+    fun showToast(str: String) = inst.invokeMethod<String, Unit?>("showToast", str)
+
 }

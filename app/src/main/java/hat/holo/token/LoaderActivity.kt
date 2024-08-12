@@ -24,6 +24,7 @@ class LoaderActivity : Activity() {
         val zActivity = loader.loadClass("hat.holo.token.TokenActivity")
         val actIntent = Intent(this, zActivity)
         actIntent.putExtra("accountInfo", intent.getSerializableExtra("accountInfo"))
+        actIntent.putExtra("deviceInfo", intent.getSerializableExtra("deviceInfo"))
         startActivityForResult(actIntent, 1234)
     }
 

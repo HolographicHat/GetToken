@@ -31,6 +31,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.getSystemService
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import hat.holo.token.models.AccountInfo
+import hat.holo.token.models.DeviceInfo
 import kotlinx.coroutines.delay
 
 val textColor = Color(0xFF424242)
@@ -44,6 +45,7 @@ class TokenActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setTheme(androidx.appcompat.R.style.Theme_AppCompat_Light_NoActionBar)
+        val deviceInfo = intent.getSerializableExtra("deviceInfo") as DeviceInfo
         val accountInfo = intent.getSerializableExtra("accountInfo") as AccountInfo
         setContent {
             rememberSystemUiController().setStatusBarColor(Color.White)
@@ -53,7 +55,7 @@ class TokenActivity : ComponentActivity() {
                 ),
                 content = {
                     Surface {
-                        Content(accountInfo)
+                        Content(deviceInfo, accountInfo)
                     }
                 }
             )
@@ -70,7 +72,7 @@ private fun TokenActivity.showDialog(msg: String) = runOnUiThread {
 }
 
 @Composable
-private fun TokenActivity.Content(accountInfo: AccountInfo) = Column(
+private fun TokenActivity.Content(deviceInfo: DeviceInfo, accountInfo: AccountInfo) = Column(
     modifier = Modifier.fillMaxSize()
 ) {
     TopAppBar()
@@ -79,6 +81,14 @@ private fun TokenActivity.Content(accountInfo: AccountInfo) = Column(
     ) {
         var grantSToken by remember { mutableStateOf(false) }
         var showDoneIcon by remember { mutableStateOf(false) }
+        CustomCheckBox(
+            checked = true,
+            onCheckedChange = {},
+            name = "DeviceInfo",
+            permissions = buildAnnotatedString {
+                appendLine("绕过米游社风控所需的设备ID与指纹")
+            }
+        )
         CustomCheckBox(
             checked = true,
             onCheckedChange = {},
@@ -116,6 +126,8 @@ private fun TokenActivity.Content(accountInfo: AccountInfo) = Column(
                                 put("mid", accountInfo.mid)
                                 put("stoken", accountInfo.sToken)
                             }
+                            put("device_id", deviceInfo.id)
+                            put("device_fp", deviceInfo.fingerprint)
                         }.map { (k, v) -> "$k=$v" }.joinToString(";")
                         val clip = ClipData.newPlainText(null, authStr)
                         getSystemService<ClipboardManager>()!!.setPrimaryClip(clip)
@@ -133,7 +145,7 @@ private fun TokenActivity.Content(accountInfo: AccountInfo) = Column(
                         colorFilter = ColorFilter.tint(Color(0xFF4CAF50))
                     )
                 }
-                Text("复制登录信息")
+                Text("复制到剪贴板")
             }
         }
         LaunchedEffect(showDoneIcon) {
