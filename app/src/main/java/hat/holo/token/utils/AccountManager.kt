@@ -24,6 +24,6 @@ object AccountManager {
     val lToken get() = clzPorte.getDeclaredMethod("getLToken").invoke(instPorte) as String?
     val sToken get() = clzAccount.getDeclaredMethod("getTokenStr").invoke(loginCurrentAccount()) as String?
 
-    val accountInfo get() = AccountInfo(mid!!, uid!!, lToken!!, sToken!!)
+    val accountInfo get() = AccountInfo(mid!!, uid!!, lToken, sToken!!)
 
 }
