@@ -35,7 +35,7 @@ jobs:
     - name: Patch package
       run: "mkdir out && mv app/build/outputs/apk/release/app-release.apk . && java -jar gradle/lspatch/jar-v0.5.1-361-release.jar -f -l 2 -m app-release.apk -o out miyoushe.apk && mv app-release.apk out"
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3.1.0
+      uses: actions/upload-artifact@v4.6.0
       with:
         name: Artifacts
         path: out
